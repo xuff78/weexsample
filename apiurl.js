@@ -3,5 +3,6 @@
  */
 exports.apiurl = {
     pageurl: 'http://172.16.10.66:8080/dist/',
-    imgurl: 'http://172.16.10.66:8080/image/'
+    imgurl: 'http://172.16.10.66:8080/image/',
+    imghttpurl: 'http://longforlearn.b0.upaiyun.com/'
 }
