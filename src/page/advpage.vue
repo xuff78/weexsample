@@ -70,7 +70,7 @@
                 </div>
             </cell>
             <cell class="cell">
-                <text class="bannartxt">你要的好课，都在这里</text>
+                <text class="bannartxt" @click="test">你要的好课，都在这里</text>
             </cell>
             <cell class="cell">
                 <div class="courselayout" v-if="listdata.course_info">
@@ -115,11 +115,13 @@
             }
         },
         methods: {
+            test(){
+                this.target="刷新以后"
+            },
             onrefresh: function () {
                 this.refreshing = 'show'
                 var self=this;
                 this.getAds();
-                this.target="刷新以后"
                 setTimeout(function () {
                     modal.toast({ message: 'pulling down finish', duration: 1 })
                     self.refreshing = 'hide'
