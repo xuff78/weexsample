@@ -9,17 +9,6 @@
         height: 400px;
         background-color: #ddd;
     }
-    .indicator{
-        margin-top: 20px;
-        margin-bottom: 20px;
-        width:60px;
-        height:60px;
-        color:#889967;
-    }
-    .refresh-view{
-        width:750px;
-        align-items:center;
-    }
     .courselayout{  flex-direction: row;flex-wrap: wrap;  align-items: center;position: relative; padding-left: 20px; padding-right: 20px; }
     .billboard{  flex-direction: column;flex-wrap: wrap;  align-items: center;position: relative; padding-left: 50px; padding-right: 30px; }
     .listitem{width:710px;padding-top: 15px;}
@@ -37,20 +26,17 @@
 <template>
     <div>
         <myheader ref="myheader" class="headerstyle" :title="listdata.title"></myheader>
-        <list class="list" @loadmore="fetch" loadmoreoffset="10">
-            <refresh class="refresh-view" @refresh="onrefresh" :display="refreshing">
-                <loading-indicator class="indicator" ></loading-indicator>
-            </refresh>
+        <list class="list" loadmoreoffset="10">
             <cell class="cell">
                 <slider class="slider" interval="3000" auto-play="true">
-                    <div class="slider" v-for="img in imageList">
+                    <div class="slider" v-for="imgurl in imageList">
                         <image class="slider" resize="cover" :src="img.url"></image>
                     </div>
                 </slider>
             </cell>
             <cell class="cell">
-                <text class="bannartxt" >{{target}}</text>
-                <div class="billboard" v-if="listdata.course_info">
+                <text class="bannartxt" @click="getAds">{{target}}</text>
+                <div class="billboard" >
                     <div class="listitem" v-for="(item, index) in listdata.course_info">
                         <div style="flex-direction: row; padding-bottom: 15px;">
                             <text style="font-size: 30px; color: #e12e2e;">No.{{index+1}}</text>
@@ -70,10 +56,10 @@
                 </div>
             </cell>
             <cell class="cell">
-                <text class="bannartxt" @click="test">你要的好课，都在这里</text>
+                <text class="bannartxt" @click="jump('/testnext')">你要的好课，都在这里</text>
             </cell>
             <cell class="cell">
-                <div class="courselayout" v-if="listdata.course_info">
+                <div class="courselayout">
                     <div class="courseitem" v-for="item in listdata.course_info">
                         <image class="courseimg" resize="cover"
                                :src="imghead+item.img"/>
@@ -104,28 +90,15 @@
         },
         data: function(){
             return {
-                refreshing: 'hide',
-                refresh: '下拉刷新',
                 imageList: [],
                 target: '最受欢迎的课程评选',
-                listdata:{
-                    type: Object
-                },
+                listdata:{},
                 imghead: urls.apiurl.imghttpurl
             }
         },
         methods: {
-            test(){
-                this.target="刷新以后"
-            },
             onrefresh: function () {
-                this.refreshing = 'show'
-                var self=this;
-                this.getAds();
-                setTimeout(function () {
-                    modal.toast({ message: 'pulling down finish', duration: 1 })
-                    self.refreshing = 'hide'
-                }, 2000)
+
             },
             getAds(){
                 //千万记得这句（先在外部声明),不能在回调中直接使用this.function(),不然不执行
@@ -135,18 +108,18 @@
                     //回调执行
                     var json=JSON.parse(ret.jsonData)
                     self.listdata=json.data
-                    var topimage={url: urls.apiurl.imghttpurl+self.listdata.img}
+                    var topimage={imgurl: urls.apiurl.imghttpurl+self.listdata.img}
                     self.imageList.push(topimage)
                     self.imageList.push(topimage)
 //                    modal.toast({ message: ret.jsonData, duration: 1 })
-//                    modal.toast({ message: topimage, duration: 1 })
-                    modal.toast({ message: self.listdata.course_info[0].img })
+                    modal.toast({ message: self.listdata, duration: 1 })
+//                    modal.toast({ message: self.listdata.course_info[0].img })
                 });
             }
         },
         created: function() {
-              var base = this.$getConfig().bundleUrl
-              this.target=base .substring(0, base.lastIndexOf('/')+1)
+//              var base = this.$getConfig().bundleUrl
+//              this.target=base .substring(0, base.lastIndexOf('/')+1)
               this.getAds()
          }
     }
