@@ -29,8 +29,8 @@
         <list class="list" loadmoreoffset="10">
             <cell class="cell">
                 <slider class="slider" interval="3000" auto-play="true">
-                    <div class="slider" v-for="imgurl in imageList">
-                        <image class="slider" resize="cover" :src="img.url"></image>
+                    <div class="slider" v-for="item in imageList">
+                        <image class="slider" resize="cover" :src="item.imgurl"></image>
                     </div>
                 </slider>
             </cell>
@@ -102,17 +102,16 @@
             },
             getAds(){
                 //千万记得这句（先在外部声明),不能在回调中直接使用this.function(),不然不执行
-                var self = this
                 var eventModule = weex.requireModule('httpevent')
-                eventModule.requestHttp('jsonStr',function(ret) {
+                eventModule.requestHttp('jsonStr',ret=>{
                     //回调执行
                     var json=JSON.parse(ret.jsonData)
-                    self.listdata=json.data
-                    var topimage={imgurl: urls.apiurl.imghttpurl+self.listdata.img}
-                    self.imageList.push(topimage)
-                    self.imageList.push(topimage)
+                    this.listdata=json.data
+                    var topimage={imgurl: urls.apiurl.imghttpurl+this.listdata.img}
+                    this.imageList.push(topimage)
+                    this.imageList.push(topimage)
 //                    modal.toast({ message: ret.jsonData, duration: 1 })
-                    modal.toast({ message: self.listdata, duration: 1 })
+//                    modal.toast({ message: this.listdata, duration: 1 })
 //                    modal.toast({ message: self.listdata.course_info[0].img })
                 });
             }
@@ -120,7 +119,7 @@
         created: function() {
 //              var base = this.$getConfig().bundleUrl
 //              this.target=base .substring(0, base.lastIndexOf('/')+1)
-              this.getAds()
+//              this.getAds()
          }
     }
 </script>
