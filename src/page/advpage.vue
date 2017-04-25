@@ -50,7 +50,7 @@
                             <div class="progressbar">
                                 <div class="progress"></div>
                             </div>
-                            <text class="normaltextright">37%</text>
+                            <text class="normaltextright">{{getPercent(item.follow)}}%</text>
                         </div>
                     </div>
                 </div>
@@ -93,12 +93,13 @@
                 imageList: [],
                 target: '最受欢迎的课程评选',
                 listdata:{},
+                follownum: 1.00,
                 imghead: urls.apiurl.imghttpurl
             }
         },
         methods: {
-            onrefresh: function () {
-
+            getPercent: function (e) {
+                return this.follownum*100
             },
             getAds(){
                 //千万记得这句（先在外部声明),不能在回调中直接使用this.function(),不然不执行
@@ -110,7 +111,12 @@
                     var topimage={imgurl: urls.apiurl.imghttpurl+this.listdata.img}
                     this.imageList.push(topimage)
                     this.imageList.push(topimage)
-//                    modal.toast({ message: ret.jsonData, duration: 1 })
+                    var num=0
+                    for(var count = 0; count < this.listdata.course_info.length; count++){
+                        num=num+listdata.course_info[count]
+                    }
+                    this.follownum=num
+                    modal.toast({ message: num+'', duration: 1 })
 //                    modal.toast({ message: this.listdata, duration: 1 })
 //                    modal.toast({ message: self.listdata.course_info[0].img })
                 });
