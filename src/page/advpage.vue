@@ -99,7 +99,8 @@
                 target: '最受欢迎的课程评选',
                 listdata:{},
                 follownum: 1.00,
-                imghead: urls.apiurl.imghttpurl
+                imghead: urls.apiurl.imghttpurl,
+                advert_id: ''
             }
         },
         methods: {
@@ -121,7 +122,9 @@
             getAds(){
                 //千万记得这句（先在外部声明),不能在回调中直接使用this.function(),不然不执行
                 var eventModule = weex.requireModule('httpevent')
-                eventModule.requestHttp('jsonStr',ret=>{
+                var jsonStr = '{url:"http://106.75.5.58:43330/education/homepage/advert", params:[{name:"advert_id", value:"'+this.advert_id+'"}]}';
+                modal.toast({ message: 'jsonStr: '+jsonStr, duration: 1 })
+                eventModule.requestHttp(jsonStr, ret=>{
                     //回调执行
                     var json=JSON.parse(ret.jsonData)
                     this.listdata=json.data
@@ -140,7 +143,8 @@
             }
         },
         created: function() {
-//              var base = this.$getConfig().bundleUrl
+              this.advert_id = this.$getConfig().advert_id
+              modal.toast({ message: 'advert_id: '+this.advert_id, duration: 1 })
 //              this.target=base .substring(0, base.lastIndexOf('/')+1)
 //              this.getAds()
          }
