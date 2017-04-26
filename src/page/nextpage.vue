@@ -20,14 +20,14 @@
         mixins:[mixins],
         data: function(){
             return {
-                target: '刷新之前',
+                target: '叫你乱点，看进入了异次元了',
                 data:{}
             }
         },
         methods: {
             test(){
                 modal.toast({ message: '点击', duration: 1 })
-                this.target='刷新以后'
+                this.target='我擦，还敢乱点'
                 this.data={itemlist:[{imgl:11}, {imgl:22}, {imgl:33}, {imgl:44}]}
             }
         }
