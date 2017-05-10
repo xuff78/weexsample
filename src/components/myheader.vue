@@ -1,12 +1,13 @@
 <template>
   <div class="row">
-    <image :src="imageback" class="imgleft" @onclick="pageback"></image>
+    <image :src="imageback" class="imgleft" @click="pageback"></image>
     <text class="text">{{title}}</text>
     <image :src="imageright" class="imgright"></image>
   </div>
 </template>
 <script>
     var urls=require('../../apiurl.js');
+    var pageevent = weex.requireModule('pageevent')
     import mixins from '../mixins'
     export default {
         mixins:[mixins],
@@ -17,7 +18,7 @@
         },
         methods: {
             pageback: function (e) {
-                weex.requireModule('WeexUtilModule').closePage()
+                pageevent.closePage()
             }
         }
     }

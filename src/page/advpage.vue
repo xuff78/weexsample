@@ -6,7 +6,7 @@
     }
     .slider {
         width: 750px;
-        height: 400px;
+        height: 340px;
         background-color: #ddd;
     }
     .courselayout{  flex-direction: row;flex-wrap: wrap;  align-items: center;position: relative; padding-left: 20px; padding-right: 20px; }
@@ -39,16 +39,16 @@
             <cell class="cell" v-if="listdata.is_arrange==1">
                 <text class="bannartxt" @click="jump('/testnext')">{{target}}</text>
                 <div class="billboard" >
-                    <div class="listitem" v-for="(item, index) in listdata.course_info">
-                        <div style="flex-direction: row; padding-bottom: 15px;">
+                    <div class="listitem" v-for="(item, index) in listdata.course_info" >
+                        <div style="flex-direction: row; padding-bottom: 15px;" @click="toCoursePage(item.course_id, item.course_type)">
                             <text style="font-size: 30px; color: #e12e2e;">No.{{index+1}}</text>
                             <text style="font-size: 30px; margin-left: 25px;">{{item.course_name}}</text>
                         </div>
-                        <div class="listitembottom">
+                        <div class="listitembottom" @click="toTeacherPage(item.usercode)">
                             <text class="normaltext">{{item.user_name}}</text>
                             <text class="normaltextright">{{item.follow}}人在学习</text>
                         </div>
-                        <div class="listitembottom">
+                        <div class="listitembottom" @click="toTeacherPage(item.usercode)">
                             <div class="progressbar">
                                 <div class="progress" :style="{ width: item.follow/follownum*580 + 'px' }"></div>
                             </div>
@@ -58,11 +58,11 @@
                 </div>
             </cell>
             <cell class="cell">
-                <text class="bannartxt" @click="getAds">你要的好课，都在这里</text>
+                <text class="bannartxt" >你要的好课，都在这里</text>
             </cell>
             <cell class="cell">
                 <div class="courselayout">
-                    <div class="courseitem" v-for="item in listdata.course_info">
+                    <div class="courseitem" v-for="item in listdata.course_info" @click="toCoursePage(item.course_id, item.course_type)">
                         <div class="courseimg">
                             <image class="courseimg" resize="cover" style="position: absolute;"
                                    :src="imghead+item.img"/>
@@ -85,6 +85,7 @@
     var urls=require('../../apiurl.js');
     var event = weex.requireModule('event')
     var modal = weex.requireModule('modal')
+    var pageevent = weex.requireModule('pageevent')
     import mixins from '../mixins'
     import myheader from '../components/myheader.vue'
 
@@ -104,6 +105,12 @@
             }
         },
         methods: {
+            toCoursePage(advert_id, type){
+                pageevent.toCourseDetailPage({ advert_id: advert_id, type: type })
+            },
+            toTeacherPage(usercode){
+                pageevent.toTeacherDetailPage({ usercode: usercode})
+            },
             getCourseType: function (type) {
                 var typestr=new String()
                 switch (type){
@@ -121,32 +128,40 @@
             },
             getAds(){
                 //千万记得这句（先在外部声明),不能在回调中直接使用this.function(),不然不执行
+                var self=this
                 var eventModule = weex.requireModule('httpevent')
-                var jsonStr = '{url:"http://106.75.5.58:43330/education/homepage/advert", params:[{name:"advert_id", value:"'+this.advert_id+'"}]}';
-                modal.toast({ message: 'jsonStr: '+jsonStr, duration: 1 })
+                var jsonStr = '{"url":"http://106.75.91.154:43330/education/homepage/advert", "params":[{"name":"advert_id", "value":"'+this.advert_id+'"}]}';
+//                modal.toast({ message: 'jsonStr: '+jsonStr, duration: 1 })
                 eventModule.requestHttp(jsonStr, ret=>{
                     //回调执行
                     var json=JSON.parse(ret.jsonData)
-                    this.listdata=json.data
-                    var topimage={imgurl: urls.apiurl.imghttpurl+this.listdata.img}
-                    this.imageList.push(topimage)
-                    this.imageList.push(topimage)
-                    var num=0
-                    for(var count = 0; count < this.listdata.course_info.length; count++){
-                        num=num+this.listdata.course_info[count].follow
+                    if (json.return_code==0) {
+                        self.listdata = json.data
+                        var topimage = {imgurl: urls.apiurl.imghttpurl + self.listdata.img}
+                        self.imageList.push(topimage)
+                        self.imageList.push(topimage)
+//                        modal.toast({message: topimage, duration: 1})
+                        var num = 0
+                        for (var count = 0; count < self.listdata.course_info.length; count++) {
+                            num = num + self.listdata.course_info[count].follow
+                        }
+                        self.follownum = num
+                    }else{
+                        modal.alert({
+                            message: json.return_code+'\n\n'+json.return_message,
+                            duration: 0.3
+                        }, function (value) {
+                            pageevent.closePage()
+                        })
                     }
-                    this.follownum=num
-//                    modal.toast({ message: num+'', duration: 1 })
-//                    modal.toast({ message: this.listdata, duration: 1 })
-//                    modal.toast({ message: self.listdata.course_info[0].img })
                 });
             }
         },
         created: function() {
               this.advert_id = this.$getConfig().advert_id
-              modal.toast({ message: 'advert_id: '+this.advert_id, duration: 1 })
+//              modal.toast({ message: 'advert_id: '+this.advert_id, duration: 1 })
 //              this.target=base .substring(0, base.lastIndexOf('/')+1)
-//              this.getAds()
+              this.getAds()
          }
     }
 </script>
